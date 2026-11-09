@@ -1,9 +1,9 @@
 // Waiting until document has loaded
 window.onload = () => {
 
-  // YOUR CODE GOES HERE
-  console.log("YOUR CODE GOES HERE");
-
-  // Load the data set from the assets folder:
+d3.csv("cars.csv", d3.autoType).then(data => {
+    console.log(data.filter(d => d["City Miles Per Gallon"] > 100));
+    console.log(data.filter(d => d["Highway Miles Per Gallon"] < 0));
+});
 
 };
