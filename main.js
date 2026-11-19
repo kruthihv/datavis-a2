@@ -11,7 +11,7 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     cleanData.sort((a, b) => b["Horsepower(HP)"] - a["Horsepower(HP)"]);
 
     // Chart size, with margins for the axes
-    const margin = { top: 20, right: 20, bottom: 50, left: 60 };
+    const margin = { top: 20, right: 150, bottom: 50, left: 60 };
     const width = 800 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
@@ -67,7 +67,7 @@ d3.csv("cars.csv", d3.autoType).then(data => {
         .attr("fill", d => color(d.Type))
         .attr("stroke", "white").attr("stroke-width", 1)
         .attr("opacity", 0.8);
-        
+
     // y-axis label
     svg.append("text")
     .attr("x", width / 2)            // horizontally centred under the plot
@@ -83,6 +83,36 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     .attr("transform", "rotate(-90)") // below the axis numbers
     .text("City Miles per Gallon");
 
+    // Color legend: one row per car type
+
+    const legend = svg.append("g")
+    .attr("transform", `translate(${width + 20}, 40)`);  // just right of the plot
+
+    legend.append("text")
+    .attr('x', 0)
+    .attr('y', -20)
+    .text("Car Type")
+
+    legend.selectAll("circle")
+    .data(color.domain())
+    .enter()
+    .append("circle")
+        .attr("cx", 0)
+        .attr("cy", (d, i) => i * 20)   // i = 0, 1, 2… so each row is 20 px lower
+        .attr("r", 6)
+        .attr("dominant-baseline", "middle")
+        .attr("fill", d => color(d))
+
+    legend.selectAll(".legend-label")
+    .data(color.domain())
+    .enter()
+    .append("text")
+        .attr("class", "legend-label")   
+        .attr("x", 20)
+        .attr("y", (d, i) => i * 20)   
+        .attr("dominant-baseline", "middle")
+        .text(d => d)
+        .attr("font-size", 12);
 })
 
 };
