@@ -67,6 +67,21 @@ d3.csv("cars.csv", d3.autoType).then(data => {
         .attr("fill", d => color(d.Type))
         .attr("stroke", "white").attr("stroke-width", 1)
         .attr("opacity", 0.8);
+        
+    // y-axis label
+    svg.append("text")
+    .attr("x", width / 2)            // horizontally centred under the plot
+    .attr("y", height + 40)          // below the axis numbers
+    .attr("text-anchor", "middle")   // centre the text on that point
+    .text("Retail Price (USD)");
+
+    // y-axis label
+    svg.append("text")
+    .attr("x", -height/2)            
+    .attr("y", -35)
+    .attr("text-anchor", "middle")
+    .attr("transform", "rotate(-90)") // below the axis numbers
+    .text("City Miles per Gallon");
 
 })
 
