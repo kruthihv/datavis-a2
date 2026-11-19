@@ -8,6 +8,7 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     d["City Miles Per Gallon"] > 0 && d["City Miles Per Gallon"] < 100
     );
     console.log(data.length, cleanData.length);
+    cleanData.sort((a, b) => b["Horsepower(HP)"] - a["Horsepower(HP)"]);
 
     // Chart size, with margins for the axes
     const margin = { top: 20, right: 20, bottom: 50, left: 60 };
@@ -42,15 +43,30 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     svg.append("g")
     .call(d3.axisLeft(y)); 
 
+    const color = d3.scaleOrdinal()
+    .domain(["Sedan", "SUV", "Sports Car", "Wagon", "Minivan"])
+    .range(["#0072B2", "#E69F00", "#CC79A7", "#009E73", "#56B4E9"]);
+
+     // z: Horsepower → circle radius (sqrt, so area ∝ HP)
+    const z = d3.scaleSqrt()
+    .domain([0,d3.max(cleanData, d => d["Horsepower(HP)"])])
+    .range([0, 8])
+
+    // Draw the axes
+    svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x));
+
     svg.selectAll("circle")
     .data(cleanData)
     .enter()
     .append("circle")
         .attr("cx", d => x(d["Retail Price"]))
         .attr("cy", d => y(d["City Miles Per Gallon"]))
-        .attr("r", 4)
-        .attr("fill", "steelblue")
-        .attr("opacity", 0.7);
+        .attr("r", d => z(d["Horsepower(HP)"]))
+        .attr("fill", d => color(d.Type))
+        .attr("stroke", "white").attr("stroke-width", 1)
+        .attr("opacity", 0.8);
 
 })
 
