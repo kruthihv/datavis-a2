@@ -52,11 +52,6 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     .domain([0,d3.max(cleanData, d => d["Horsepower(HP)"])])
     .range([0, 8])
 
-    // Draw the axes
-    svg.append("g")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x));
-
     svg.selectAll("circle")
     .data(cleanData)
     .enter()
@@ -66,9 +61,9 @@ d3.csv("cars.csv", d3.autoType).then(data => {
         .attr("r", d => z(d["Horsepower(HP)"]))
         .attr("fill", d => color(d.Type))
         .attr("stroke", "white").attr("stroke-width", 1)
-        .attr("opacity", 0.8);
+        .attr("fill-opacity", 0.8);
 
-    // y-axis label
+    // x-axis label
     svg.append("text")
     .attr("x", width / 2)            // horizontally centred under the plot
     .attr("y", height + 40)          // below the axis numbers
@@ -113,6 +108,38 @@ d3.csv("cars.csv", d3.autoType).then(data => {
         .attr("dominant-baseline", "middle")
         .text(d => d)
         .attr("font-size", 12);
+
+    // Size legend: example horsepower values, drawn with the same z scale as the dots
+    const sizeLegend = svg.append("g")
+    .attr("transform", `translate(${width + 20}, 190)`);   // below the color legend
+
+    sizeLegend.append("text")
+    .attr("y", -20)
+    .text("Horsepower");
+
+    const hpExamples = [100, 250, 450];
+
+    sizeLegend.selectAll(".size-dot")
+    .data(hpExamples)
+    .enter()
+    .append("circle")
+        .attr("class", "size-dot")
+        .attr("cx", 0)
+        .attr("cy", (d, i) => i * 25)
+        .attr("r", d => z(d))          // same scale as the chart → sizes match exactly
+        .attr("fill", "#999")
+        .attr("stroke", "white");
+
+    sizeLegend.selectAll(".size-label")
+    .data(hpExamples)
+    .enter()
+    .append("text")
+        .attr("class", "size-label")
+        .attr("x", 20)
+        .attr("y", (d, i) => i * 25)
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", 12)
+        .text(d => d + " hp");
 })
 
 };
