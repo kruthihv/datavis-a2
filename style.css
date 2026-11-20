@@ -3,5 +3,8 @@ body {
 }
 
 body { font-family: sans-serif; }
+#container { display: flex; align-items: flex-start; gap: 20px; }
+#details   { min-width: 220px; font-size: 14px; }
+#details td { padding: 2px 8px; }
 
 /* YOUR CSS CODE GOES HERE */

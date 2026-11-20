@@ -15,6 +15,8 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     const width = 800 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
+
+
     // Create the SVG and a group shifted inside the margins
     const svg = d3.select("#scatterplot")
     .append("svg")
@@ -22,6 +24,17 @@ d3.csv("cars.csv", d3.autoType).then(data => {
         .attr("height", height + margin.top + margin.bottom)
     .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // The six attributes shown in the details panel
+    const detailAttrs = ["Type", "Retail Price", "City Miles Per Gallon",
+                     "Horsepower(HP)", "Engine Size (l)", "Highway Miles Per Gallon"];
+
+    function resetSelection() {
+    svg.selectAll(".dot")
+        .attr("stroke", "white").attr("stroke-width", 1)
+        .attr("fill-opacity", 0.8);
+    d3.select("#details").html("Click a dot to see details");
+    }
 
     // x: Retail Price → horizontal pixels
     const x = d3.scaleLinear()
@@ -34,6 +47,13 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     .domain(d3.extent(cleanData, d => d["City Miles Per Gallon"]))
     .range([height, 0])
     .nice();
+
+    // Invisible background: clicking empty space clears the selection
+    svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "transparent")
+    .on("click", resetSelection);
 
     // Draw the axes
     svg.append("g")
@@ -52,16 +72,35 @@ d3.csv("cars.csv", d3.autoType).then(data => {
     .domain([0,d3.max(cleanData, d => d["Horsepower(HP)"])])
     .range([0, 8])
 
-    svg.selectAll("circle")
+    svg.selectAll(".dot")
     .data(cleanData)
     .enter()
     .append("circle")
+        .attr("class", "dot")    
         .attr("cx", d => x(d["Retail Price"]))
         .attr("cy", d => y(d["City Miles Per Gallon"]))
         .attr("r", d => z(d["Horsepower(HP)"]))
         .attr("fill", d => color(d.Type))
         .attr("stroke", "white").attr("stroke-width", 1)
-        .attr("fill-opacity", 0.8);
+        .attr("fill-opacity", 0.8)
+        .style("cursor", "pointer")
+        .on("click", function (d) {
+        // 1. Reset all dots, then highlight the clicked one
+            svg.selectAll(".dot")
+                .attr("stroke", "white").attr("stroke-width", 1)
+                .attr("fill-opacity", 0.3);              // fade the others
+            d3.select(this)
+                .attr("stroke", "black").attr("stroke-width", 2)
+                .attr("fill-opacity", 1)
+                .raise();                                 // move it to the top layer
+
+            // 2. Fill the details panel
+            d3.select("#details").html(
+                `<h3>${d.Name}</h3>
+                <table>
+                ${detailAttrs.map(a => `<tr><td>${a}</td><td>${d[a]}</td></tr>`).join("")}
+                </table>`
+        ); });
 
     // x-axis label
     svg.append("text")
